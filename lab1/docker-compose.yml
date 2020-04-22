@@ -1,0 +1,44 @@
+version: '3.4'
+services:
+ mysql:
+   hostname: mysql
+   image: mysql:5.7
+   restart: always
+   logging:
+     driver: none
+   environment:
+     MYSQL_DATABASE: 'videogame'
+     MYSQL_USER: 'alice'
+     MYSQL_PASSWORD: 'pwd123'
+     MYSQL_ROOT_PASSWORD: 'rootpwd123'
+   ports:
+     - '3306:3306'
+
+
+ video-game-server: 
+   hostname: video-game-server
+   build:
+     context: video-game-server
+     dockerfile: Dockerfile
+   ports:
+     - "8761:8761"
+   depends_on:
+     - mysql
+
+
+ video-game-client:
+   hostname: video-game-client
+   environment:
+     - EUREKA_SERVER=http://video-game-server:8761/eureka
+     - MYSQL=mysql:3306
+   build:
+     context: video-game-client
+     dockerfile: Dockerfile
+   ports:
+     - "8080:8080"
+   depends_on:
+     - video-game-server
+   
+
+   
+ 

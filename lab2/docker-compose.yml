@@ -1,0 +1,49 @@
+version: '3.4'
+services:
+ mysql:
+   hostname: mysql
+   image: mysql:5.7
+   restart: always
+   logging:
+     driver: none
+   environment:
+     MYSQL_DATABASE: 'videogame'
+     MYSQL_USER: 'root'
+     MYSQL_PASSWORD: 'rootpwd123'
+     MYSQL_ROOT_PASSWORD: 'rootpwd123'
+   ports:
+     - '3306:3306'
+
+
+ video-game-server: 
+   build:
+     context: video-game-server
+     dockerfile: Dockerfile
+   ports:
+     - "8761:8761"
+
+ video-game-client:
+   environment:
+     - MYSQL=mysql:3306
+   build:
+     context: video-game-client
+     dockerfile: Dockerfile
+   ports:
+     - "8081-8082:8081"
+   depends_on:
+     - video-game-server
+     - mysql
+
+ api-gateway:
+   build:
+     context: api-gateway
+     dockerfile: Dockerfile
+   ports:
+     - "8080:8080"
+   depends_on:
+     - video-game-server
+     - video-game-client
+   
+
+   
+ 
