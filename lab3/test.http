@@ -1,0 +1,25 @@
+### Api-gateway config
+GET http://localhost:8080/games/configs
+Content-type: application/json
+
+### Service (instance 1) config
+GET http://localhost:8081/games/configs
+Content-type: application/json
+
+### Service (instance 2) config
+GET http://localhost:8082/games/configs
+Content-type: application/json
+
+### Client configs in config server
+GET http://localhost:8888/video-game-client/default
+Content-type: application/json
+
+### Api-gateway configs in config server
+http://localhost:8888/api-gateway/default
+Content-type: application/json
+
+### Config refresh
+POST http://localhost:8081/actuator/refresh
+
+### Bus refresh
+POST http://localhost:8081/actuator/bus-refresh
