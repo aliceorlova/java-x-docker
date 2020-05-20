@@ -1,0 +1,113 @@
+version: '3.4'
+services:
+ mysql:
+   hostname: mysql
+   image: mysql:5.7
+   restart: always
+   logging:
+     driver: none
+   environment:
+     MYSQL_DATABASE: 'videogame'
+     MYSQL_USER: 'root'
+     MYSQL_PASSWORD: 'rootpwd123'
+     MYSQL_ROOT_PASSWORD: 'rootpwd123'
+   ports:
+     - '3306:3306'
+ 
+ rabbitmq:
+    hostname: rabbitmq
+    image: rabbitmq:3
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+
+ prometheus:
+   image: prom/prometheus
+   container_name: prometheus
+   volumes:
+     - ./prometheus.yml:/etc/prometheus/prometheus.yml
+   ports:
+     - "9090:9090"
+     - "9080:9080"
+
+ grafana:
+   image: grafana/grafana
+   ports:
+     - "3000:3000"
+
+ zookeeper:
+    image: wurstmeister/zookeeper
+    ports:
+      - "2181:2181"
+    hostname: zookeeper
+
+ kafka:
+    image: wurstmeister/kafka
+    command: [start-kafka.sh]
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_CREATE_TOPICS: "create.entity:3:1,update.entity:3:1" # topic:partition:replicas
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_PORT: 9092
+    depends_on:
+      - "zookeeper"
+
+ configserver:
+   environment:
+     WAITFORIT_HOST: video-game-server
+     WAITFORIT_PORT: 8761
+     WAITFORIT_TIMEOUT: 120
+   build:
+     context: configserver
+     dockerfile: Dockerfile
+   ports:
+     - "8888:8888"
+   depends_on:
+     - video-game-server
+
+ video-game-server: 
+   build:
+     context: video-game-server
+     dockerfile: Dockerfile
+   ports:
+     - "8761:8761"
+
+ video-game-client:
+   environment:
+     MYSQL: mysql:3306
+     WAITFORIT_HOST: configserver
+     WAITFORIT_PORT: 8888
+     WAITFORIT_TIMEOUT: 250
+   build:
+     context: video-game-client
+     dockerfile: Dockerfile
+   ports:
+     - "8081-8082:8081"
+   depends_on:
+     - video-game-server
+     - mysql
+     - configserver
+
+ api-gateway:
+   environment:
+     WAITFORIT_HOST: configserver
+     WAITFORIT_PORT: 8888
+     WAITFORIT_TIMEOUT: 250
+   build:
+     context: api-gateway
+     dockerfile: Dockerfile
+   ports:
+     - "8080:8080"
+   depends_on:
+     - video-game-server
+     - video-game-client
+     - configserver
+
+ consumer:
+    hostname: consumer
+    build:
+      context: consumer
+      dockerfile: Dockerfile
+      

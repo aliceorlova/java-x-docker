@@ -1,0 +1,43 @@
+### Fetch entities
+GET http://localhost:8080/games
+Content-type: application/json
+
+### Fetch entity
+GET http://localhost:8080/games/1
+Content-type: application/json
+
+### Delete entities
+DELETE http://localhost:8080/games/1
+Content-type: application/json
+
+### Create entity
+POST http://localhost:8080/games
+Content-type: application/json
+
+{
+	"name":"Last of us",
+	"description":"Post apocalyptic game with lots and lots of zombies",
+	"writer":"Neil Druckmann",
+	"publisher":"Sony Computer Entertainment",
+	"developer":"Naughty Dog",
+	"category":"Survival horror",
+	"initialReleaseDate":"2013-06-14",
+	"price":250
+}
+
+### Update entity
+PUT http://localhost:8080/games/1
+Content-type: application/json
+
+{
+	"name":"Last of us",
+	"description":"Post apocalyptic game with lots and lots of zombies",
+	"writer":"Neil Druckmann",
+	"publisher":"Sony Computer Entertainment",
+	"developer":"Naughty Dog",
+	"category":"Survival horror",
+	"initialReleaseDate":"2013-06-14",
+	"price":550
+}
+
+
