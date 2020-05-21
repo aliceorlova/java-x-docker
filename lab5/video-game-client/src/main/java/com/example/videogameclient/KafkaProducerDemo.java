@@ -22,7 +22,7 @@ public class KafkaProducerDemo {
         final Producer<Integer, String> producer = createProducer();
 
         try {
-            final ProducerRecord<Integer, String> record = new ProducerRecord<>(message, entity.getId(), entity.getName());
+            final ProducerRecord<Integer, String> record = new ProducerRecord<>(message, message + " "+ entity.getId() + " " + entity.getName());
 
             RecordMetadata metadata = producer.send(record).get();
 

@@ -61,7 +61,7 @@ public class VideogameController {
     @RequestMapping(path = "", method = RequestMethod.POST)
     ResponseEntity<?> Add(@RequestBody VideoGame game) {
         try {
-            producer.sendMessage(game,TOPIC_CREATED);
+            KafkaProducerDemo.sendMessage(game,TOPIC_CREATED);
             return new ResponseEntity<>(_service.Add(game), HttpStatus.OK);
         } catch (CustomException e) {
             return new ResponseEntity<>(e.mes, HttpStatus.BAD_REQUEST);
@@ -83,7 +83,7 @@ public class VideogameController {
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
     ResponseEntity<?> Update(@RequestBody VideoGame game, @PathVariable int id) {
         try {
-            producer.sendMessage(game,TOPIC_UPDATED);
+            KafkaProducerDemo.sendMessage(game,TOPIC_UPDATED);
             game.setId(id);
             VideoGame res = _service.Update(game);
             return new ResponseEntity<>(res, HttpStatus.OK);

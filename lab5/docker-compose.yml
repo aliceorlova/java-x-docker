@@ -13,7 +13,70 @@ services:
      MYSQL_ROOT_PASSWORD: 'rootpwd123'
    ports:
      - '3306:3306'
- 
+
+ configserver:
+   hostname: configserver
+   environment:
+     WAITFORIT_HOST: video-game-server
+     WAITFORIT_PORT: 8761
+     WAITFORIT_TIMEOUT: 400
+   build:
+     context: configserver
+     dockerfile: Dockerfile
+   ports:
+     - "8888:8888"
+   depends_on:
+     - video-game-server
+
+ video-game-server: 
+   build:
+     context: video-game-server
+     dockerfile: Dockerfile
+   ports:
+     - "8761:8761"
+
+ video-game-client:
+   environment:
+     MYSQL: mysql:3306
+     WAITFORIT_HOST: configserver
+     WAITFORIT_PORT: 8888
+     WAITFORIT_TIMEOUT: 400
+   build:
+     context: video-game-client
+     dockerfile: Dockerfile
+   ports:
+     - "8081-8082:8081"
+   depends_on:
+     - video-game-server
+     - mysql
+     - configserver
+
+ api-gateway:
+   environment:
+     WAITFORIT_HOST: configserver
+     WAITFORIT_PORT: 8888
+     WAITFORIT_TIMEOUT: 400
+   build:
+     context: api-gateway
+     dockerfile: Dockerfile
+   ports:
+     - "8080:8080"
+   depends_on:
+     - video-game-server
+     - video-game-client
+     - configserver
+
+ consumer:
+    build:
+      context: consumer
+      dockerfile: Dockerfile
+    environment:
+      WAITFORIT_HOST: kafka
+      WAITFORIT_PORT: 9092
+      WAITFORIT_TIMEOUT: 200
+    depends_on:
+      - kafka
+
  rabbitmq:
     hostname: rabbitmq
     image: rabbitmq:3
@@ -54,60 +117,5 @@ services:
     depends_on:
       - "zookeeper"
 
- configserver:
-   environment:
-     WAITFORIT_HOST: video-game-server
-     WAITFORIT_PORT: 8761
-     WAITFORIT_TIMEOUT: 120
-   build:
-     context: configserver
-     dockerfile: Dockerfile
-   ports:
-     - "8888:8888"
-   depends_on:
-     - video-game-server
 
- video-game-server: 
-   build:
-     context: video-game-server
-     dockerfile: Dockerfile
-   ports:
-     - "8761:8761"
-
- video-game-client:
-   environment:
-     MYSQL: mysql:3306
-     WAITFORIT_HOST: configserver
-     WAITFORIT_PORT: 8888
-     WAITFORIT_TIMEOUT: 250
-   build:
-     context: video-game-client
-     dockerfile: Dockerfile
-   ports:
-     - "8081-8082:8081"
-   depends_on:
-     - video-game-server
-     - mysql
-     - configserver
-
- api-gateway:
-   environment:
-     WAITFORIT_HOST: configserver
-     WAITFORIT_PORT: 8888
-     WAITFORIT_TIMEOUT: 250
-   build:
-     context: api-gateway
-     dockerfile: Dockerfile
-   ports:
-     - "8080:8080"
-   depends_on:
-     - video-game-server
-     - video-game-client
-     - configserver
-
- consumer:
-    hostname: consumer
-    build:
-      context: consumer
-      dockerfile: Dockerfile
       
