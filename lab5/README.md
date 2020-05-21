@@ -14,4 +14,4 @@ Grafana UI(username/password:admin/admin): http://localhost:3000
 To get valid response, add /games to any service or api-gateway URL, ie http://localhost:8080/games  
 
 To see consumer's logs:   
-docker logs -f <docker container id>   
+docker logs -f {{docker container id}}     
